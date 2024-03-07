@@ -1,0 +1,31 @@
+resources:
+  ports:
+    - 6379
+    - 8265
+
+workdir: .
+
+setup: |
+  echo "*** setup"
+
+  source ./utils/install_kind.sh
+
+  kind create cluster --image=kindest/node:v1.23.0
+
+  source ./utils/install_helm.sh
+
+  source ./utils/install_kuberay.sh
+
+  source ./utils/install_kubectl.sh
+  
+  kubectl get rayclusters
+  kubectl get pods --selector=ray.io/cluster=raycluster-kuberay
+
+run: |
+  echo "*** run"
+
+  # source ./utils/run_kuberay_job.sh
+
+  export HEAD_POD=$(kubectl get pods --selector=ray.io/node-type=head -o custom-columns=POD:metadata.name --no-headers)
+  echo $HEAD_POD
+  kubectl exec -it $HEAD_POD -- python -c "import ray; ray.init(); print(ray.cluster_resources())"

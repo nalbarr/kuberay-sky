@@ -1,0 +1,5 @@
+boto3
+skypilot
+ray==2.7.1
+ray[serve]
+kubernetes
